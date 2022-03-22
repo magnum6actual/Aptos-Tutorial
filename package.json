@@ -4,7 +4,6 @@
   "description": "Utility for Aptos tutorials",
   "main": "index.js",
   "scripts": {
-    "test": "testing",
     "run": "npx ts-node src/main.ts", 
 	"lint": "eslint . --fix"
   },

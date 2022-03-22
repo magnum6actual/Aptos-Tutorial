@@ -1,11 +1,11 @@
 // Copyright (c) The Aptos Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-import * as SHA3 from "js-sha3";
+import { sha3_256 } from "js-sha3";
 import fetch from "cross-fetch";
-import * as Nacl from "tweetnacl";
+import { SignKeyPair, sign } from "tweetnacl";
 import assert from "assert";
-import * as fs from "fs";
+import { writeFileSync, readFileSync } from "fs";
 
 export const TESTNET_URL = "https://fullnode.devnet.aptoslabs.com";
 export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
@@ -15,15 +15,15 @@ export type TxnRequest = Record<string, any> & { sequence_number: string };
 
 /** Represents an account as well as the private, public key-pair for the Aptos blockchain */
 export class Account {
-  signingKey: Nacl.SignKeyPair;
+  signingKey: SignKeyPair;
 
   constructor(path: string = "", seed?: Uint8Array | undefined) {
     if (seed) {
-      this.signingKey = Nacl.sign.keyPair.fromSeed(seed);
+      this.signingKey = sign.keyPair.fromSeed(seed);
     } else if (path) {
       this.signingKey = this.loadAccount(path);
     } else {
-      this.signingKey = Nacl.sign.keyPair();
+      this.signingKey = sign.keyPair();
     }
   }
 
@@ -34,7 +34,7 @@ export class Account {
 
   /** Returns the authKey for the associated account */
   authKey(): string {
-    let hash = SHA3.sha3_256.create();
+    let hash = sha3_256.create();
     hash.update(Buffer.from(this.signingKey.publicKey));
     hash.update("\x00");
     return hash.hex();
@@ -47,34 +47,33 @@ export class Account {
 
   saveAccount(path: string) {
     // saving as a string to make file human readable
-    fs.writeFileSync(path, this.signingKey.secretKey.toString());
+    writeFileSync(path, this.signingKey.secretKey.toString());
   }
 
-  loadAccount(path: string): Nacl.SignKeyPair {
+  loadAccount(path: string): SignKeyPair {
     // readable file incurs more work to load back to keypair
-    const content = fs.readFileSync(path).toString();
+    const content = readFileSync(path).toString();
     const keyArray = Uint8Array.from(
       content.split(",").map((value) => {
         return parseInt(value);
       })
     );
-    return Nacl.sign.keyPair.fromSecretKey(Buffer.from(keyArray));
+    return sign.keyPair.fromSecretKey(Buffer.from(keyArray));
   }
 }
 
-//<:!:section_1
-
-//:!:>section_2
 /** A wrapper around the Aptos-core Rest API */
 export class RestClient {
   url: string;
 
-  constructor(url: string) {
-    this.url = url;
+  constructor(url: string = "") {
+    if (url) {
+      this.url = url;
+    } else {
+      this.url = TESTNET_URL;
+    }
   }
 
-  //<:!:section_2
-  //:!:>section_3
   /** Returns the sequence number and authentication key for an account */
   async account(accountAddress: string): Promise<Record<string, string> & { sequence_number: string }> {
     const response = await fetch(`${this.url}/accounts/${accountAddress}`, { method: "GET" });
@@ -93,9 +92,18 @@ export class RestClient {
     return await response.json();
   }
 
-  //<:!:section_3
+  /** Publish a new module to the blockchain within the specified account */
+  async publishModule(accountFrom: Account, moduleHex: string): Promise<string> {
+    const payload = {
+      type: "module_bundle_payload",
+      modules: [{ bytecode: `0x${moduleHex}` }],
+    };
+    const txnRequest = await this.generateTransaction(accountFrom.address(), payload);
+    const signedTxn = await this.signTransaction(accountFrom, txnRequest);
+    const res = await this.submitTransaction(accountFrom, signedTxn);
+    return res["hash"];
+  }
 
-  //:!:>section_4
   /** Generates a transaction request that can be submitted to produce a raw transaction that
    can be signed, which upon being signed can be submitted to the blockchain. */
   async generateTransaction(sender: string, payload: Record<string, any>): Promise<TxnRequest> {
@@ -126,7 +134,7 @@ export class RestClient {
     }
     const result: Record<string, any> & { message: string } = await response.json();
     const toSign = Buffer.from(result["message"].substring(2), "hex");
-    const signature = Nacl.sign(toSign, accountFrom.signingKey.secretKey);
+    const signature = sign(toSign, accountFrom.signingKey.secretKey);
     const signatureHex = Buffer.from(signature).toString("hex").slice(0, 128);
     txnRequest["signature"] = {
       type: "ed25519_signature",
@@ -173,15 +181,11 @@ export class RestClient {
     }
   }
 
-  //<:!:section_4
-  //:!:>section_5
   /** Returns the test coin balance associated with the account */
   async accountBalance(accountAddress: string): Promise<number | null> {
     const resources = await this.accountResources(accountAddress);
     for (const key in resources) {
       const resource = resources[key];
-      console.log("K " + key);
-      console.log("R " + JSON.stringify(resource));
       if (resource["type"] == "0x1::TestCoin::Balance") {
         return parseInt(resource["data"]["coin"]["value"]);
       }
@@ -205,15 +209,17 @@ export class RestClient {
   }
 }
 
-//<:!:section_5
-//:!:>section_6
 /** Faucet creates and funds accounts. This is a thin wrapper around that. */
 export class FaucetClient {
   url: string;
   restClient: RestClient;
 
-  constructor(url: string, restClient: RestClient) {
-    this.url = url;
+  constructor(restClient: RestClient, url: string = "") {
+    if (url) {
+      this.url = url;
+    } else {
+      this.url = FAUCET_URL;
+    }
     this.restClient = restClient;
   }
 
