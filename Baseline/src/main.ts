@@ -55,8 +55,17 @@ const publishModule = async (modulePath: string, account: Account) => {
   const restClient = new RestClient();
   let txHash = await restClient.publishModule(account, moduleHex);
   await restClient.waitForTransaction(txHash);
+  console.log("Publish complete.");
+};
+
+const publishTicketsModule = () => {
+  const tickets = new Account("./.secrets/tickets.key");
+  const modulePath = "../Tickets/build/tutorials/bytecode_modules/Tickets.mv";
+  publishModule(modulePath, tickets);
 };
 
 //createAndFundAccounts();
 
 //loadAccounts();
+
+publishTicketsModule();
