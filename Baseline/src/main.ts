@@ -1,4 +1,5 @@
 import { Account, FaucetClient, RestClient } from "./utility";
+import { readFileSync } from "fs";
 
 const createAndFundAccounts = async () => {
   console.log("\n=== Creating keypairs ===");
@@ -36,7 +37,7 @@ const loadAccounts = async () => {
   const bob = new Account("./.secrets/bob.key");
   console.log(`Bob: ${bob.address()}`);
 
-  const tickets = new Account("./.secrets/alice.key");
+  const tickets = new Account("./.secrets/tickets.key");
   console.log(`Tickets: ${tickets.address()}`);
 
   const restClient = new RestClient();
@@ -46,6 +47,14 @@ const loadAccounts = async () => {
   console.log(`Alice: ${await restClient.accountBalance(alice.address())}`);
   console.log(`Bob: ${await restClient.accountBalance(bob.address())}`);
   console.log(`Tickets: ${await restClient.accountBalance(tickets.address())}`);
+};
+
+const publishModule = async (modulePath: string, account: Account) => {
+  const moduleHex = readFileSync(modulePath).toString("hex");
+  console.log("Publishing...");
+  const restClient = new RestClient();
+  let txHash = await restClient.publishModule(account, moduleHex);
+  await restClient.waitForTransaction(txHash);
 };
 
 //createAndFundAccounts();
