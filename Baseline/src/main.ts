@@ -68,4 +68,4 @@ const publishTicketsModule = () => {
 
 //loadAccounts();
 
-publishTicketsModule();
+//publishTicketsModule();
