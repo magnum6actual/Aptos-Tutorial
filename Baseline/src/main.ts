@@ -64,8 +64,13 @@ const publishTicketsModule = () => {
   publishModule(modulePath, tickets);
 };
 
-//createAndFundAccounts();
+createAndFundAccounts();
 
-//loadAccounts();
-
+// loadAccounts();
+// const restClient = new RestClient();
+// const faucetClient = new FaucetClient(restClient);
+// const alice = new Account("./.secrets/alice.key");
+// console.log("\n=== Funding accounts ===");
+// faucetClient.fundAccount(alice.pubKey(), 10_000_000);
+//await faucetClient.fundAccount(bob.pubKey(), 10_000_000);
 //publishTicketsModule();
