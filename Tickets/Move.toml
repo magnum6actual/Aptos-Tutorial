@@ -3,9 +3,8 @@ name = "tutorials"
 version = "0.1.0"
 
 [addresses]
-TicketTutorial = "9b0a2b8dbf5ccadd1fd96b84b8bb9ff7"
-AptosFramework = "0x1" # Specify and assign 0x1 to the named address "Std"
+AptosFramework = "0x1"
+TicketTutorial = "0xe110"
 
 [dependencies]
-AptosFramework = { local = "../../aptos-core/aptos-move/framework/aptos-framework" }
-MoveNursery = { local = "../../aptos-core/aptos-move/framework/move-stdlib/nursery" }
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir="aptos-move/framework/aptos-framework", rev = "0b834fc218648d759e93a7d61a432d0dce6c9946" }

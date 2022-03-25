@@ -1,18 +1,21 @@
+# cargo.toml
 [package]
 name = "tutorial"
 version = "0.1.0"
-repository = "https://github.com/aptos-core/aptos-labs"
 license = "Apache-2.0"
 publish = false
 edition = "2018"
 
 
 [dependencies]
-aptos-vm = { path = "../../aptos-core/aptos-move/aptos-vm" }
-aptos-workspace-hack = { path = "../../aptos-core/crates/aptos-workspace-hack" }
-framework = { path = "../../aptos-core/aptos-move/framework" }
+aptos-vm ={ git = "https://github.com/aptos-labs/aptos-core", rev = "5b525691957a59bf29a68b9b897142e1a351a7be" }
+# aptos-workspace-hack = { git = "https://github.com/aptos-labs/aptos-core", subdir="crates/aptos-workspace-hack/", rev = "0b834fc218648d759e93a7d61a432d0dce6c9946" }
+# framework = { git = "https://github.com/aptos-labs/aptos-core", subdir="aptos-move/framework/", rev = "0b834fc218648d759e93a7d61a432d0dce6c9946" }
 structopt = "0.3.21"
 move-compiler = { git = "https://github.com/diem/move", rev = "8a260b82dda8175a98ea848fab5adcce467585b3" }
 move-package = { git = "https://github.com/diem/move", rev = "8a260b82dda8175a98ea848fab5adcce467585b3" }
-move-stdlib = { git = "https://github.com/diem/move", rev = "8a260b82dda8175a98ea848fab5adcce467585b3" }
 move-unit-test = { git = "https://github.com/diem/move", rev = "8a260b82dda8175a98ea848fab5adcce467585b3" }
+move-cli = { git = "https://github.com/diem/move", rev = "8a260b82dda8175a98ea848fab5adcce467585b3" }
+
+[lib]
+
