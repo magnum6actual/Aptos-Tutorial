@@ -5,6 +5,7 @@ version = "0.1.0"
 [addresses]
 AptosFramework = "0x1"
 TicketTutorial = "0xe110"
+CoreResources = "0xA550C18"
 
 [dependencies]
-AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir="aptos-move/framework/aptos-framework", rev = "0b834fc218648d759e93a7d61a432d0dce6c9946" }
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir="aptos-move/framework/aptos-framework", rev = "bc22a6e9be01aed65d7b9e2a0ed001d5f3d9e2ab" }
