@@ -27,7 +27,7 @@ module TicketTutorial::Tickets {
 	const EMAX_SEATS: u64 = 6;
 	const EINVALID_BALANCE: u64 = 7;
 
-	public fun init_venue(venue_owner: &signer, max_seats: u64) {
+	public(script) fun init_venue(venue_owner: &signer, max_seats: u64) {
 		let available_tickets = Vector::empty<ConcertTicket>();
 		move_to<Venue>(venue_owner, Venue {available_tickets, max_seats})
 	}
@@ -65,14 +65,14 @@ module TicketTutorial::Tickets {
 		return (success, price)
 	}
 
-	public fun purchase_ticket(buyer: &signer, venue_owner_addr: address, seat: vector<u8>) acquires Venue, TicketEnvelope {
+	public(script) fun purchase_ticket(buyer: &signer, venue_owner_addr: address, seat: vector<u8>) acquires Venue, TicketEnvelope {
 		
 		let buyer_addr = Signer::address_of(buyer);
 		let (success, _, price, index) = get_ticket_info(venue_owner_addr, seat);
 		assert!(success, EINVALID_TICKET);		
 		
 		let venue = borrow_global_mut<Venue>(venue_owner_addr);
-		TestCoin::transfer_internal(buyer, venue_owner_addr, price);
+		TestCoin::transfer(buyer, venue_owner_addr, price);
 		let ticket = Vector::remove<ConcertTicket>(&mut venue.available_tickets, index);
 
 		if (!exists<TicketEnvelope>(buyer_addr)) {
@@ -112,7 +112,7 @@ module TicketTutorial::Tickets {
         let faucet_addr = Signer::address_of(&faucet);
         let buyer_addr = Signer::address_of(&buyer);
         TestCoin::mint_internal(&faucet, faucet_addr, amount);
-        TestCoin::transfer(faucet, buyer_addr, 100);
+        TestCoin::transfer(&faucet, buyer_addr, 100);
         assert!(TestCoin::balance_of(buyer_addr) == 100, EINVALID_BALANCE);
 
 		// buy a ticket and confirm account balance changes
