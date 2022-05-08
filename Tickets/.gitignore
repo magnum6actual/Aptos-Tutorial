@@ -1,5 +1,4 @@
 build
-storage
-target
 .DS_Store
 aptos-framework
+.aptos
