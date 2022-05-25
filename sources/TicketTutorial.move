@@ -2,12 +2,12 @@ module TicketTutorial::Tickets {
     use Std::Signer;
 	use Std::ASCII;
 	use Std::Vector;
-    //use AptosFramework::TestCoin::TestCoin;
+    use AptosFramework::TestCoin::TestCoin;
 	use AptosFramework::Coin;
 	use AptosFramework::Table::{Self, Table};
     use AptosFramework::ManagedCoin;
 
-    struct TestCoin {}
+    //struct TestCoin {}
 
 	struct SeatIdentifier has store, copy, drop {
 		row: ASCII::String,
