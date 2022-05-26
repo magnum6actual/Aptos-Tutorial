@@ -5,7 +5,6 @@ version = "0.1.0"
 [addresses]
 AptosFramework = "0x1"
 TicketTutorial = "0xe110"
-CoreResources = "0xA550C18"
 
 [dependencies]
 AptosFramework = { local = "../aptos-core/aptos-move/framework/aptos-framework" }

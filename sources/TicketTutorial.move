@@ -7,8 +7,6 @@ module TicketTutorial::Tickets {
 	use AptosFramework::Table::{Self, Table};
     use AptosFramework::ManagedCoin;
 
-    //struct TestCoin {}
-
 	struct SeatIdentifier has store, copy, drop {
 		row: ASCII::String,
 		seat_number: u64
@@ -78,17 +76,14 @@ module TicketTutorial::Tickets {
 	// 	return (success, price)
 	// }
 
-	public(script) fun purchase_ticket(buyer: &signer, venue_owner_addr: address, row: vector<u8>, seat_number: u64) acquires Venue, TicketEnvelope {
-		
-		let buyer_addr = Signer::address_of(buyer);
-		//let (success, _, price, index) = get_ticket_info(venue_owner_addr, seat);
-		//assert!(success, EINVALID_TICKET);		
+	public(script) fun purchase_ticket(buyer: &signer, venue_owner_addr: address, row: vector<u8>, seat_number: u64) acquires Venue, TicketEnvelope {	
+		let buyer_addr = Signer::address_of(buyer);	
 		let target_seat_id = SeatIdentifier { row: ASCII::string(row), seat_number };
-		let venue = borrow_global_mut<Venue>(venue_owner_addr);
+		let venue = borrow_global_mut<Venue>(venue_owner_addr);	
+		assert!(Table::contains<SeatIdentifier, ConcertTicket>(&venue.available_tickets, &target_seat_id), EINVALID_TICKET);
 		let target_ticket = Table::borrow<SeatIdentifier, ConcertTicket>(&venue.available_tickets, &target_seat_id);
 		Coin::transfer<TestCoin>(buyer, venue_owner_addr, target_ticket.price);
 		let ticket = Table::remove<SeatIdentifier, ConcertTicket>(&mut venue.available_tickets, &target_seat_id);
-
 		if (!exists<TicketEnvelope>(buyer_addr)) {
 			move_to<TicketEnvelope>(buyer, TicketEnvelope {tickets: Vector::empty<ConcertTicket>()});
 		};	
