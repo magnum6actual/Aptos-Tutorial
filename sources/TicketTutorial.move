@@ -116,8 +116,10 @@ module TicketTutorial::Tickets {
 
 		// initialize & fund account to buy tickets
         ManagedCoin::initialize<TestCoin>(&faucet, b"TestCoin", b"TEST", 6, false);
-        ManagedCoin::register<TestCoin>(&venue_owner);
+        ManagedCoin::register<TestCoin>(&faucet);
+		ManagedCoin::register<TestCoin>(&venue_owner);
 		ManagedCoin::register<TestCoin>(&buyer);
+		
         let amount = 1000;
         let faucet_addr = Signer::address_of(&faucet);
         let buyer_addr = Signer::address_of(&buyer);
