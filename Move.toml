@@ -4,8 +4,7 @@ version = "0.1.0"
 
 [addresses]
 AptosFramework = "0x1"
-TicketTutorial = "0xe110"
-CoreResources = "0xA550C18"
+TicketTutorial = "B0DB254C80D3E747FF9CFC0D68878C27C0365EBEC49834E92E27CD398327999E"
 
 [dependencies]
 AptosFramework = { local = "../aptos-core/aptos-move/framework/aptos-framework" }
